@@ -34,12 +34,14 @@ Luego visita `http://localhost:3000`.
 
 | Asteroide | Puntos |
 | --------- | ------ |
-| Grande    | 20     |
-| Mediano   | 50     |
-| Pequeño   | 100    |
+| Grande          | 20     |
+| Mediano         | 50     |
+| Pequeño         | 100    |
+| Estrella fugaz  | 500    |
 
 ## Características
 
 - 3 vidas con invencibilidad temporal al reaparecer (parpadeo)
 - Asteroides se parten en fragmentos más pequeños al ser destruidos
 - Partículas de explosión al destruir asteroides
+- Asteroide "estrella fugaz": rápido, destructible (500 pts) y se desvanece con el tiempo

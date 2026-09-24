@@ -29,4 +29,4 @@ También funciona abriendo `index.html` directamente en el navegador, aunque alg
 ## Notas
 
 - No hay tests, linter ni formateador configurados.
-- El README menciona power-ups y una "estrella fugaz". El power-up "Velocidad" ya está implementado en `game.js`; la "estrella fugaz" sigue pendiente.
+- El README menciona power-ups y una "estrella fugaz". El power-up "Velocidad" y la "estrella fugaz" ya están implementados en `game.js`.
