@@ -41,11 +41,21 @@ Luego visita `http://localhost:3000`.
 | Pequeño         | 100    |
 | Estrella fugaz  | 500    |
 
+## Power-ups
+
+Caen de asteroides destruidos (~8% de probabilidad) y duran 10 s en pantalla:
+
+| Power-up       | Efecto                                              |
+| -------------- | --------------------------------------------------- |
+| Velocidad      | Doble empuje durante 5 s                            |
+| Triple disparo | Abanico de 3 balas durante 5 s (también con `T`)     |
+| Escudo         | 3 cargas; cada una absorbe un impacto de asteroide  |
+
 ## Características
 
 - 3 vidas con invencibilidad temporal al reaparecer (parpadeo)
 - Asteroides se parten en fragmentos más pequeños al ser destruidos
 - Partículas de explosión al destruir asteroides
 - Asteroide "estrella fugaz": rápido, destructible (500 pts) y se desvanece con el tiempo
-- Power-ups al destruir asteroides: "Velocidad" (rayo cian) y "Triple disparo" (magenta, abanico de 3 balas; también con `T`), 5 s de duración
+- Power-ups al destruir asteroides: "Velocidad" (rayo cian), "Triple disparo" (magenta, abanico de 3 balas; también con `T`) y "Escudo" (hexágono verde, absorbe impactos)
 - 5 skins de nave intercambiables en pleno juego (`S`/`Q`), con la elección persistida en localStorage

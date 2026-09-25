@@ -29,5 +29,5 @@ También funciona abriendo `index.html` directamente en el navegador, aunque alg
 ## Notas
 
 - No hay tests, linter ni formateador configurados.
-- El README menciona power-ups y una "estrella fugaz". Los power-ups "Velocidad" y "Triple disparo", y la "estrella fugaz" ya están implementados en `game.js`. La tecla `T` activa el triple disparo.
+- El README menciona power-ups y una "estrella fugaz". Los power-ups "Velocidad", "Triple disparo" (tecla `T`) y "Escudo" (3 cargas que absorben impactos de asteroides, ver `SHIELD_MAX` y `ship.shield`), y la "estrella fugaz" ya están implementados en `game.js`. `PowerUp` es la clase base (rayo cian) con subclases `PowerUpTriple` y `PowerUpShield`.
 - Sistema de skins de la nave ya implementado: constante `SKINS` (silueta + color + llama por skin), cambio en pleno juego con `S`/`Q` (`cycleSkin`, funciona en cualquier estado), persistencia en localStorage (clave `asteroids-skin`, con `try/catch`) e íconos de vida que usan la skin activa. La hitbox (`radius 12`) es igual para todas.
