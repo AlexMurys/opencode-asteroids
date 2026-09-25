@@ -232,6 +232,7 @@ class Ship {
     this.invincible    = 3;
     this.shootCooldown = 0;
     this.speedBoost    = 0;
+    this.tripleShot    = 0;
     this.dead          = false;
   }
 
@@ -240,6 +241,7 @@ class Ship {
     if (this.invincible    > 0) this.invincible    -= dt;
     if (this.shootCooldown > 0) this.shootCooldown -= dt;
     if (this.speedBoost    > 0) this.speedBoost    -= dt;
+    if (this.tripleShot    > 0) this.tripleShot    -= dt;
 
     const ROT   = 3.5;   // rad/s
     const THRUST = 260;  // px/s²
@@ -267,7 +269,14 @@ class Ship {
     const NOSE = 21;
     const ox = this.x + Math.cos(this.angle) * NOSE;
     const oy = this.y + Math.sin(this.angle) * NOSE;
-    return [new Bullet(ox, oy, this.angle)];
+    if (this.tripleShot <= 0) return [new Bullet(ox, oy, this.angle)];
+
+    const SPREAD = 0.09;
+    return [
+      new Bullet(ox, oy, this.angle - SPREAD),
+      new Bullet(ox, oy, this.angle),
+      new Bullet(ox, oy, this.angle + SPREAD),
+    ];
   }
 
   draw() {
@@ -278,7 +287,7 @@ class Ship {
     ctx.save();
     ctx.translate(this.x, this.y);
     ctx.rotate(this.angle);
-    ctx.strokeStyle = this.speedBoost > 0 ? '#0ff' : '#fff';
+    ctx.strokeStyle = this.speedBoost > 0 ? '#0ff' : this.tripleShot > 0 ? '#f0f' : '#fff';
     ctx.lineWidth   = 1.5;
     ctx.lineJoin    = 'round';
 
@@ -337,7 +346,7 @@ class Particle {
   }
 }
 
-// ── Power Up: Velocidad ───────────────────────────────────────────────────────
+// ── Power Ups ─────────────────────────────────────────────────────────────────
 class PowerUp {
   constructor(x, y) {
     this.x = x;
@@ -346,6 +355,8 @@ class PowerUp {
     this.ttl = 10;
     this.dead = false;
     this.pulse = rand(0, Math.PI * 2);
+    this.color = '#0ff';
+    this.rgb   = '0, 255, 255';
 
     const angle = rand(0, Math.PI * 2);
     const speed = 40;
@@ -361,17 +372,7 @@ class PowerUp {
     if (this.ttl <= 0) this.dead = true;
   }
 
-  draw() {
-    const scale = 1 + Math.sin(this.pulse) * 0.12;
-    const alpha = 0.35 + Math.sin(this.pulse) * 0.15;
-
-    ctx.save();
-    ctx.translate(this.x, this.y);
-    ctx.scale(scale, scale);
-    ctx.strokeStyle = '#0ff';
-    ctx.lineWidth = 1.5;
-    ctx.lineJoin = 'round';
-
+  drawIcon() {
     // Rayo
     ctx.beginPath();
     ctx.moveTo( 5, -8);
@@ -382,13 +383,46 @@ class PowerUp {
     ctx.lineTo( 3, -2);
     ctx.closePath();
     ctx.stroke();
+  }
+
+  draw() {
+    const scale = 1 + Math.sin(this.pulse) * 0.12;
+    const alpha = 0.35 + Math.sin(this.pulse) * 0.15;
+
+    ctx.save();
+    ctx.translate(this.x, this.y);
+    ctx.scale(scale, scale);
+    ctx.strokeStyle = this.color;
+    ctx.lineWidth = 1.5;
+    ctx.lineJoin = 'round';
+
+    this.drawIcon();
 
     // Aura pulsante
     ctx.beginPath();
     ctx.arc(0, 0, this.radius, 0, Math.PI * 2);
-    ctx.strokeStyle = `rgba(0, 255, 255, ${alpha.toFixed(2)})`;
+    ctx.strokeStyle = `rgba(${this.rgb}, ${alpha.toFixed(2)})`;
     ctx.stroke();
     ctx.restore();
+  }
+}
+
+class PowerUpTriple extends PowerUp {
+  constructor(x, y) {
+    super(x, y);
+    this.color = '#f0f';
+    this.rgb   = '255, 0, 255';
+  }
+
+  drawIcon() {
+    ctx.beginPath();
+    ctx.moveTo( 0,   8);
+    ctx.lineTo( 0,  -9);
+    ctx.moveTo(-3.5, 8);
+    ctx.lineTo(-8,  -9);
+    ctx.moveTo( 3.5, 8);
+    ctx.lineTo( 8,  -9);
+    ctx.stroke();
   }
 }
 
@@ -443,6 +477,7 @@ function killShip() {
   explode(ship.x, ship.y, 14);
   ship.dead = true;
   ship.speedBoost = 0;
+  ship.tripleShot = 0;
   lives--;
   if (lives <= 0) {
     state = 'gameover';
@@ -475,6 +510,8 @@ function update(dt) {
     bullets.push(...ship.tryShoot());
   }
 
+  if (pressed('KeyT')) ship.tripleShot = 5;
+
   ship.update(dt);
   bullets.forEach(b => b.update(dt));
   asteroids.forEach(a => a.update(dt));
@@ -501,7 +538,8 @@ function update(dt) {
         a.dead = true;
         score += a.bonus ?? POINTS[a.size];
         explode(a.x, a.y, a.boom ?? a.size * 5);
-        if (Math.random() < 0.08) powerups.push(new PowerUp(a.x, a.y));
+        if (Math.random() < 0.08)
+          powerups.push(Math.random() < 0.5 ? new PowerUp(a.x, a.y) : new PowerUpTriple(a.x, a.y));
         newAsteroids.push(...a.split());
       }
     }
@@ -516,7 +554,8 @@ function update(dt) {
   for (const pu of powerups) {
     if (!pu.dead && dist(ship, pu) < ship.radius + pu.radius) {
       pu.dead = true;
-      ship.speedBoost = 5;
+      if (pu instanceof PowerUpTriple) ship.tripleShot = 5;
+      else                             ship.speedBoost = 5;
       explode(pu.x, pu.y, 6);
     }
   }
@@ -566,29 +605,31 @@ function drawHUD() {
   for (let i = 0; i < lives; i++)
     drawLifeIcon(W - 16 - i * 22, 18);
 
-  // Barra de tiempo del power-up Velocidad
-  if (ship.speedBoost > 0) {
-    const pad  = 14;
-    const barW = 120;
-    const barH = 10;
-    const y    = H - 26;
-    const pct  = Math.max(0, ship.speedBoost / 5);
+  // Barras de tiempo de power-ups
+  if (ship.speedBoost > 0) drawPowerBar('VELOCIDAD', ship.speedBoost, '#0ff', H - 26);
+  if (ship.tripleShot > 0) drawPowerBar('TRIPLE',    ship.tripleShot, '#f0f', H - 46);
+}
 
-    ctx.textAlign = 'left';
-    ctx.font = '12px monospace';
-    ctx.fillStyle = '#0ff';
-    ctx.fillText('VELOCIDAD', pad, y - 6);
+function drawPowerBar(label, time, color, y) {
+  const pad  = 14;
+  const barW = 120;
+  const barH = 10;
+  const pct  = Math.max(0, time / 5);
 
-    ctx.strokeStyle = '#0ff';
-    ctx.lineWidth = 1;
-    ctx.strokeRect(pad, y, barW, barH);
+  ctx.textAlign = 'left';
+  ctx.font = '12px monospace';
+  ctx.fillStyle = color;
+  ctx.fillText(label, pad, y - 6);
 
-    ctx.fillStyle = '#0ff';
-    ctx.fillRect(pad, y, barW * pct, barH);
+  ctx.strokeStyle = color;
+  ctx.lineWidth = 1;
+  ctx.strokeRect(pad, y, barW, barH);
 
-    ctx.fillStyle = '#fff';
-    ctx.fillText(`${ship.speedBoost.toFixed(1)}s`, pad + barW + 8, y + barH - 1);
-  }
+  ctx.fillStyle = color;
+  ctx.fillRect(pad, y, barW * pct, barH);
+
+  ctx.fillStyle = '#fff';
+  ctx.fillText(`${time.toFixed(1)}s`, pad + barW + 8, y + barH - 1);
 }
 
 function drawOverlay(title, sub) {

@@ -29,4 +29,4 @@ También funciona abriendo `index.html` directamente en el navegador, aunque alg
 ## Notas
 
 - No hay tests, linter ni formateador configurados.
-- El README menciona power-ups y una "estrella fugaz". El power-up "Velocidad" y la "estrella fugaz" ya están implementados en `game.js`.
+- El README menciona power-ups y una "estrella fugaz". Los power-ups "Velocidad" y "Triple disparo", y la "estrella fugaz" ya están implementados en `game.js`. La tecla `T` activa el triple disparo.

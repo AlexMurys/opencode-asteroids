@@ -24,11 +24,12 @@ Luego visita `http://localhost:3000`.
 
 ## Controles
 
-| Tecla     | Acción     |
-| --------- | ---------- |
-| `←` `→`   | Rotar nave |
-| `↑`       | Propulsar  |
-| `Espacio` | Disparar   |
+| Tecla     | Acción               |
+| --------- | -------------------- |
+| `←` `→`   | Rotar nave           |
+| `↑`       | Propulsar            |
+| `Espacio` | Disparar             |
+| `T`       | Triple disparo (5 s) |
 
 ## Puntuación
 
@@ -45,3 +46,4 @@ Luego visita `http://localhost:3000`.
 - Asteroides se parten en fragmentos más pequeños al ser destruidos
 - Partículas de explosión al destruir asteroides
 - Asteroide "estrella fugaz": rápido, destructible (500 pts) y se desvanece con el tiempo
+- Power-ups al destruir asteroides: "Velocidad" (rayo cian) y "Triple disparo" (magenta, abanico de 3 balas; también con `T`), 5 s de duración
