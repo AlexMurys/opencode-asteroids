@@ -29,6 +29,7 @@ Luego visita `http://localhost:3000`.
 | `←` `→`   | Rotar nave |
 | `↑`       | Propulsar  |
 | `Espacio` | Disparar   |
+| `S` / `Q` | Cambiar skin de la nave (siguiente / anterior) |
 
 ## Puntuación
 
@@ -45,3 +46,4 @@ Luego visita `http://localhost:3000`.
 - Asteroides se parten en fragmentos más pequeños al ser destruidos
 - Partículas de explosión al destruir asteroides
 - Asteroide "estrella fugaz": rápido, destructible (500 pts) y se desvanece con el tiempo
+- 5 skins de nave intercambiables en pleno juego (`S`/`Q`), con la elección persistida en localStorage
