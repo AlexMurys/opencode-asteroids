@@ -24,12 +24,13 @@ Luego visita `http://localhost:3000`.
 
 ## Controles
 
-| Tecla     | Acción               |
-| --------- | -------------------- |
-| `←` `→`   | Rotar nave           |
-| `↑`       | Propulsar            |
-| `Espacio` | Disparar             |
-| `T`       | Triple disparo (5 s) |
+| Tecla     | Acción                                           |
+| --------- | ------------------------------------------------ |
+| `←` `→`   | Rotar nave                                       |
+| `↑`       | Propulsar                                        |
+| `Espacio` | Disparar                                         |
+| `T`       | Triple disparo (5 s)                             |
+| `S` / `Q` | Cambiar skin de la nave (siguiente / anterior)   |
 
 ## Puntuación
 
@@ -47,3 +48,4 @@ Luego visita `http://localhost:3000`.
 - Partículas de explosión al destruir asteroides
 - Asteroide "estrella fugaz": rápido, destructible (500 pts) y se desvanece con el tiempo
 - Power-ups al destruir asteroides: "Velocidad" (rayo cian) y "Triple disparo" (magenta, abanico de 3 balas; también con `T`), 5 s de duración
+- 5 skins de nave intercambiables en pleno juego (`S`/`Q`), con la elección persistida en localStorage
