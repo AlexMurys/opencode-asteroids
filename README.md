@@ -41,6 +41,8 @@ Luego visita `http://localhost:3000`.
 | Pequeño         | 100    |
 | Estrella fugaz  | 500    |
 
+Con la skin **MORADA** todos los puntos se duplican (a cambio de una nave el doble de grande y con el doble de hitbox).
+
 ## Power-ups
 
 Caen de asteroides destruidos (~8% de probabilidad) y duran 10 s en pantalla:
@@ -58,4 +60,5 @@ Caen de asteroides destruidos (~8% de probabilidad) y duran 10 s en pantalla:
 - Partículas de explosión al destruir asteroides
 - Asteroide "estrella fugaz": rápido, destructible (500 pts) y se desvanece con el tiempo
 - Power-ups al destruir asteroides: "Velocidad" (rayo cian), "Triple disparo" (magenta, abanico de 3 balas; también con `T`) y "Escudo" (hexágono verde, absorbe impactos)
-- 5 skins de nave intercambiables en pleno juego (`S`/`Q`), con la elección persistida en localStorage
+- 6 skins de nave intercambiables en pleno juego (`S`/`Q`), con la elección persistida en localStorage
+- Skin **MORADA**: la nave clásica a doble tamaño (hitbox doble) que otorga el doble de puntos
