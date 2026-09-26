@@ -219,7 +219,8 @@ class ShootingStar extends Asteroid {
 
 // ── Skins de la nave ──────────────────────────────────────────────────────────
 // Cada skin define silueta (body, apuntando a +x), color de trazos y color de
-// la llama. La hitbox (radius 12) es igual para todas.
+// la llama. `scale` escala la nave completa (hitbox 12 * scale) y `pointsMul`
+// multiplica los puntos obtenidos.
 const SKINS = [
   {
     name: 'CLÁSICA',
@@ -251,6 +252,14 @@ const SKINS = [
     flame: 'rgba(0, 255, 255, 0.85)',
     body: [[22, 0], [-4, -10], [-1, -3], [-14, 0], [-1, 3], [-4, 10]],
   },
+  {
+    name: 'MORADA',
+    stroke: '#b026ff',
+    flame: 'rgba(255, 0, 255, 0.85)',
+    body: [[40, 0], [-24, -18], [-14, 0], [-24, 18]],
+    scale: 2,
+    pointsMul: 2,
+  },
 ];
 
 const SKIN_KEY = 'asteroids-skin';
@@ -273,9 +282,13 @@ function saveSkinIndex(i) {
 let skinIndex = loadSkinIndex();
 let skinToast = null;   // { name, ttl }
 
+const skinScale     = () => SKINS[skinIndex].scale ?? 1;
+const skinPointsMul = () => SKINS[skinIndex].pointsMul ?? 1;
+
 function cycleSkin(dir) {
   skinIndex = wrap(skinIndex + dir, SKINS.length);
   saveSkinIndex(skinIndex);
+  ship.radius = 12 * skinScale();
   skinToast = { name: SKINS[skinIndex].name, ttl: 1.5 };
 }
 
@@ -291,7 +304,7 @@ class Ship {
     this.angle  = -Math.PI / 2;
     this.vx     = 0;
     this.vy     = 0;
-    this.radius = 12;
+    this.radius = 12 * skinScale();
     this.thrusting     = false;
     this.invincible    = 3;
     this.shootCooldown = 0;
@@ -331,7 +344,7 @@ class Ship {
   tryShoot() {
     if (this.shootCooldown > 0 || this.dead) return [];
     this.shootCooldown = 0.2;
-    const NOSE = 21;
+    const NOSE = 21 * skinScale();
     const ox = this.x + Math.cos(this.angle) * NOSE;
     const oy = this.y + Math.sin(this.angle) * NOSE;
     if (this.tripleShot <= 0) return [new Bullet(ox, oy, this.angle)];
@@ -370,10 +383,11 @@ class Ship {
     // Llama del propulsor (sale de la cola del casco)
     if (this.thrusting && Math.random() > 0.35) {
       const rear = Math.min(...skin.body.map(([x]) => x));
+      const s    = skinScale();
       ctx.beginPath();
-      ctx.moveTo(rear + 4, -4);
-      ctx.lineTo(rear + 4 - rand(6, 14), 0);
-      ctx.lineTo(rear + 4,  4);
+      ctx.moveTo(rear + 4 * s, -4 * s);
+      ctx.lineTo(rear + 4 * s - rand(6, 14) * s, 0);
+      ctx.lineTo(rear + 4 * s,  4 * s);
       ctx.strokeStyle = skin.flame;
       ctx.stroke();
     }
@@ -384,7 +398,7 @@ class Ship {
   drawShield() {
     if (this.shield <= 0) return;
 
-    const R     = 26;
+    const R     = 26 * skinScale();
     const gap   = 0.35;   // separación entre arcos (rad)
     const span  = (Math.PI * 2) / SHIELD_MAX - gap;
     // Destello breve al perder una carga
@@ -659,7 +673,7 @@ function update(dt) {
       if (!a.dead && !b.dead && dist(b, a) < a.radius) {
         b.dead = true;
         a.dead = true;
-        score += a.bonus ?? POINTS[a.size];
+        score += (a.bonus ?? POINTS[a.size]) * skinPointsMul();
         explode(a.x, a.y, a.boom ?? a.size * 5);
         if (Math.random() < 0.08) {
           const kinds = [PowerUp, PowerUpTriple, PowerUpShield];
@@ -695,7 +709,7 @@ function update(dt) {
           ship.shield--;
           ship.invincible = 0.8;
           a.dead = true;
-          score += a.bonus ?? POINTS[a.size];
+          score += (a.bonus ?? POINTS[a.size]) * skinPointsMul();
           explode(a.x, a.y, a.boom ?? a.size * 5);
           asteroids.push(...a.split());
         } else {
@@ -716,7 +730,7 @@ function update(dt) {
 // ── Draw ──────────────────────────────────────────────────────────────────────
 function drawLifeIcon(x, y) {
   const skin = SKINS[skinIndex];
-  const s = 0.45;   // escala del ícono respecto a la nave
+  const s = 0.45 / skinScale();   // escala del ícono respecto a la nave
   ctx.save();
   ctx.translate(x, y);
   ctx.rotate(-Math.PI / 2);
