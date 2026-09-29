@@ -1,0 +1,83 @@
+name: Issue Triage
+
+on:
+  issues:
+    types: [opened]
+
+jobs:
+  triage:
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: read
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+
+      - name: Run opencode
+        uses: anomalyco/opencode/github@latest
+        env:
+          OPENCODE_API_KEY: ${{ secrets.OPENCODE_API_KEY }}
+        with:
+          model: opencode-go/glm-5.2
+          prompt: |
+            Un issue acaba de abrirse en este repositorio (clon de Asteroids en
+            HTML5 Canvas, JavaScript vanilla; lee AGENTS.md y README.md para
+            contexto).
+
+            TU ÚNICA TAREA es hacer triage del issue #${{ github.event.issue.number }}:
+            etiquetarlo y reformatear su cuerpo. No crees ramas, no hagas commits,
+            no modifiques archivos del repositorio.
+
+            AUTENTICACIÓN: no hay GITHUB_TOKEN disponible. El runner ya tiene git
+            configurado con el token de la app de opencode; extráelo y autentica
+            gh CLI con él antes de usar la API (si falla, inspecciona
+            `git config --local --list` y ajusta):
+
+              export GH_TOKEN="$(git config --local --get http.https://github.com/.extraheader | awk '{print $3}' | base64 -d | cut -d: -f2)"
+
+            1. Lee el issue completo (título y cuerpo):
+               gh issue view ${{ github.event.issue.number }} --json title,body,labels
+
+            2. ELIGE EXACTAMENTE UNA etiqueta según el contenido del issue:
+               - bug: algo no funciona como debería
+               - feature: nueva funcionalidad o mejora
+               - question: consulta o duda
+               Si la etiqueta no existe en el repo, créala primero:
+               gh label create <etiqueta> --color <color> --description "<descripción>"
+               (bug=d73a4a, feature=a2eeef, question=d876e3)
+               Aplícala: gh issue edit ${{ github.event.issue.number }} --add-label <etiqueta>
+
+            3. REFORMATEA EL CUERPO del issue. Escribe el nuevo cuerpo en un
+               archivo temporal y aplícalo con:
+               gh issue edit ${{ github.event.issue.number }} --body-file <archivo>.
+               El nuevo cuerpo debe tener esta estructura EXACTA:
+
+               <!-- triage -->
+               **Resumen:** <resumen de 2-3 líneas, en español, de lo que reporta o pide el autor>
+
+               **Tipo:** bug | feature | question (la etiqueta elegida)
+
+               <Versión formateada y normalizada del contenido del issue, con las
+               secciones que apliquen según su naturaleza: Descripción / Comportamiento
+               esperado / Comportamiento actual / Pasos para reproducir / Detalles>
+
+               ---
+
+               **Texto original del autor (sin modificar):**
+               > <el cuerpo original del issue, citado línea a línea en blockquote,
+                 EXACTAMENTE como lo escribió el autor>
+
+            REGLAS ESTRICTAS:
+            - El texto original va citado (>) de forma VERBATIM: no lo recortes,
+              reformules, traduzcas ni corrijas.
+            - La versión formateada de arriba debe reflejar fielmente lo que el autor
+              quiso decir; normaliza estructura y claridad, pero NO inventes
+              información que no esté en el original.
+            - No cambies el título del issue.
+            - Si el cuerpo ya contiene el marcador <!-- triage -->, no hagas nada.
+            - Tu respuesta final se publica automáticamente como comentario en el
+              issue: confirma en 1-2 líneas qué etiqueta aplicaste y que el cuerpo
+              quedó reformateado (con el original citado abajo). No repitas el cuerpo.
